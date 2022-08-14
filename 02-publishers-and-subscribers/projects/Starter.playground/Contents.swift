@@ -106,6 +106,33 @@ example(of: "Custom Subscriber") {
     publisher.subscribe(subscriber)
 }
 
+//example(of: "Future") {
+//    func futureIncrement(integer: Int,
+//                         afterDelay delay: TimeInterval) -> Future<Int, Never> {
+//        return Future<Int, Never> { promise in
+//            print("Original")
+//            DispatchQueue.global().asyncAfter(deadline: .now() + delay) {
+//                promise(.success(integer + 1))
+//            }
+//        }
+//    }
+//    let future = futureIncrement(integer: 1, afterDelay: 2)
+//    
+//    future.sink { result in
+//        print(result)
+//    } receiveValue: { value in
+//        print("received: \(value)")
+//    }.store(in: &subscriptions)
+//    
+//    future.sink {
+//        print("Second", $0)
+//    } receiveValue: {
+//        print("Second", $0)
+//    }.store(in: &subscriptions)
+//
+//
+//}
+
 /// Copyright (c) 2021 Razeware LLC
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
