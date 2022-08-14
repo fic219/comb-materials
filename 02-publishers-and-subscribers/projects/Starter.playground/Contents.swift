@@ -4,7 +4,81 @@ import _Concurrency
 
 var subscriptions = Set<AnyCancellable>()
 
-<#Add your code here#>
+example(of: "Publisher") {
+    let myNotification = Notification.Name("MyNotification")
+    
+    let center = NotificationCenter.default
+    
+    let observer = center.addObserver(forName: myNotification,
+                                      object: nil,
+                                      queue: nil) { notification in
+        print("Notification received")
+    }
+    
+    center.post(name: myNotification, object: nil)
+    
+    center.removeObserver(observer)
+}
+
+example(of: "Subscriber") {
+    let myNoti = Notification.Name("MyNoti")
+    let center = NotificationCenter.default
+    let publisher = center.publisher(for: myNoti, object: nil)
+    
+    let subscription = publisher.sink { _ in
+        print("Notification received from publisher")
+    }
+
+    center.post(name: myNoti, object: nil)
+    
+    subscription.cancel()
+}
+
+example(of: "Just") {
+    let just = Just("Hello world")
+    
+    _ = just.sink(receiveCompletion: {
+        print("Received completion", $0)
+    }, receiveValue: {
+        print("Received value", $0)
+    })
+    
+    _ = just.sink(receiveCompletion: {
+        print("Received (another) completion", $0)
+    }, receiveValue: {
+        print("Received (another) value", $0)
+    })
+}
+
+example(of: "assign(to:on:)") {
+    class SomeObject {
+        var value: String = "" {
+            didSet {
+                print(value)
+            }
+        }
+    }
+    
+    let object = SomeObject()
+    
+    let publisher = ["Hello", "world"].publisher
+    
+    _ = publisher.assign(to: \.value, on: object)
+}
+
+example(of: "assign(to:)") {
+    class SomeObject {
+        @Published var value = -1
+    }
+    
+    let object = SomeObject()
+    
+    object.$value.sink { recVal in
+        print("received: \(recVal)")
+    }
+    
+    (0..<10).publisher.assign(to: &object.$value)
+}
 
 /// Copyright (c) 2021 Razeware LLC
 ///
