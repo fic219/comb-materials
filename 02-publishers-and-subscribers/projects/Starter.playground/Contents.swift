@@ -80,6 +80,32 @@ example(of: "assign(to:)") {
     (0..<10).publisher.assign(to: &object.$value)
 }
 
+example(of: "Custom Subscriber") {
+    let publisher = (1...6).publisher
+    
+    final class IntSubscriber: Subscriber {
+        func receive(subscription: Subscription) {
+            subscription.request(.max(2))
+        }
+        
+        func receive(_ input: Int) -> Subscribers.Demand {
+            print("Received value", input)
+            return .none
+        }
+    
+        func receive(completion: Subscribers.Completion<Never>) {
+            print("Received completion", completion)
+        }
+        
+        typealias Failure = Never
+        
+        typealias Input = Int
+    }
+    
+    let subscriber = IntSubscriber()
+    publisher.subscribe(subscriber)
+}
+
 /// Copyright (c) 2021 Razeware LLC
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
