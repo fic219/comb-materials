@@ -117,13 +117,13 @@ example(of: "Custom Subscriber") {
 //        }
 //    }
 //    let future = futureIncrement(integer: 1, afterDelay: 2)
-//    
+//
 //    future.sink { result in
 //        print(result)
 //    } receiveValue: { value in
 //        print("received: \(value)")
 //    }.store(in: &subscriptions)
-//    
+//
 //    future.sink {
 //        print("Second", $0)
 //    } receiveValue: {
@@ -132,6 +132,46 @@ example(of: "Custom Subscriber") {
 //
 //
 //}
+
+example(of: "PassthroughSubject") {
+    enum MyError: Error {
+        case test
+    }
+    final class StringSubscriber: Subscriber {
+        typealias Input = String
+        typealias Failure = MyError
+        
+        func receive(subscription: Subscription) {
+            subscription.request(.max(2))
+        }
+        
+        func receive(_ input: String) -> Subscribers.Demand {
+            print("Received value", input)
+            
+            return input == "World" ? .max(1) : .none
+        }
+        
+        func receive(completion: Subscribers.Completion<MyError>) {
+            print("Received completion", completion)
+        }
+    }
+    
+    let subscriber = StringSubscriber()
+    
+    let subject = PassthroughSubject<String, MyError>()
+    
+    subject.subscribe(subscriber)
+    
+    let subscription = subject.sink { completion in
+        print("Received completion (sink)", completion)
+    } receiveValue: { value in
+        print("Received value (sink)", value)
+    }
+
+    subject.send("Hello")
+    subject.send("Worldddd")
+    subject.send("Cucc")
+}
 
 /// Copyright (c) 2021 Razeware LLC
 ///
