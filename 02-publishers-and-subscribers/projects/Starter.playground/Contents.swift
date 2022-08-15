@@ -241,6 +241,19 @@ example(of: "Dynamically adjusting Demand") {
       subject.send(6)
 }
 
+example(of: "Type erasure") {
+  // 1
+  let subject = PassthroughSubject<Int, Never>()
+  // 2
+  let publisher = subject.eraseToAnyPublisher()
+  // 3
+  publisher
+    .sink(receiveValue: { print($0) })
+    .store(in: &subscriptions)
+  // 4
+  subject.send(0)
+}
+
 /// Copyright (c) 2021 Razeware LLC
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
