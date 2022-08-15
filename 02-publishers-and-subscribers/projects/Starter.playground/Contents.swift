@@ -147,7 +147,6 @@ example(of: "PassthroughSubject") {
         
         func receive(_ input: String) -> Subscribers.Demand {
             print("Received value", input)
-            
             return input == "World" ? .max(1) : .none
         }
         
@@ -169,8 +168,16 @@ example(of: "PassthroughSubject") {
     }
 
     subject.send("Hello")
-    subject.send("Worldddd")
-    subject.send("Cucc")
+    subject.send("World")
+    
+    subscription.cancel()
+    
+    subject.send("Still there?")
+    subject.send(completion: .failure(MyError.test))
+    subject.send(completion: .finished)
+    subject.send("How about another one?")
+    
+    
 }
 
 /// Copyright (c) 2021 Razeware LLC
