@@ -180,6 +180,27 @@ example(of: "PassthroughSubject") {
     
 }
 
+example(of: "CurrentValueSubject") {
+    var subscriptions = Set<AnyCancellable>()
+    let subject = CurrentValueSubject<Int, Never>(0)
+    
+    subject.print().sink { value in
+        print("received value: \(value)")
+    }.store(in: &subscriptions)
+    
+    subject.send(1)
+    subject.send(2)
+    
+    print("current value:\(subject.value)")
+    
+    subject
+        .print()
+     .sink(receiveValue: { print("Second subscription:", $0) })
+     .store(in: &subscriptions)
+    
+    subject.send(completion: .finished)
+}
+
 /// Copyright (c) 2021 Razeware LLC
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
