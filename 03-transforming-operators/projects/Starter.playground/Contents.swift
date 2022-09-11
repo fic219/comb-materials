@@ -85,6 +85,25 @@ example(of: "replaceEmpty(with:)") {
         .store(in: &subscriptions)
 }
 
+example(of: "scan") {
+    var dailyGainLoss: Int { .random(in: -10...10)}
+    
+    let august2019 = (0..<22)
+        .map { _ -> Int in
+            let ll = dailyGainLoss
+            print("loss: \(ll)")
+            return ll
+        }
+        .publisher
+    
+    august2019
+        .scan(20) { latest, current in
+            max(0, latest + current)
+        }
+        .sink(receiveValue: {print($0)})
+        .store(in: &subscriptions)
+}
+
 /// Copyright (c) 2021 Razeware LLC
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
