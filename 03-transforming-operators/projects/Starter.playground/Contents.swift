@@ -75,6 +75,16 @@ example(of: "replacenil") {
         .store(in: &subscriptions)
 }
 
+example(of: "replaceEmpty(with:)") {
+    let empty = Empty<Int, Never>()
+    
+    empty
+        .replaceEmpty(with: 7)
+        .sink(receiveCompletion: {print($0)},
+              receiveValue: { print($0)})
+        .store(in: &subscriptions)
+}
+
 /// Copyright (c) 2021 Razeware LLC
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
