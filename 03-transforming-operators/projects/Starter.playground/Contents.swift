@@ -3,7 +3,54 @@ import Combine
 
 var subscriptions = Set<AnyCancellable>()
 
-<#Add your code here#>
+example(of: "collect") {
+    ["A", "B", "C"].publisher
+        .collect(2)
+        .sink { result in
+            switch result {
+            case .failure:
+                print("failed")
+            case .finished:
+                print("finished")
+            }
+        } receiveValue: { string in
+            print("received: \(string)")
+        }
+        .store(in: &subscriptions)
+
+}
+
+example(of: "map") {
+    ["A", "B", "C"].publisher
+        .map { $0 + " hinnye"}
+        .sink(receiveValue: {print("tranformed: \($0)")})
+        .store(in: &subscriptions)
+}
+
+example(of: "map_keppath") {
+    struct TObj {
+        let value1: Int
+        let value2: String
+        var value3: String {
+            "\(value1) db \(value2)"
+        }
+    }
+
+    let publisher = PassthroughSubject<TObj, Never>()
+    
+    publisher
+        .map(\.value1, \.value2, \.value3)
+        .sink { v1, v2, v3 in
+            print("v1: \(v1)", "v2: \(v2)", "v3: \(v3)")
+        }
+        .store(in: &subscriptions)
+    
+    publisher.send(TObj(value1: 10, value2: "value2"))
+}
+
+example(of: "flatMap") {
+    
+}
 
 /// Copyright (c) 2021 Razeware LLC
 ///
