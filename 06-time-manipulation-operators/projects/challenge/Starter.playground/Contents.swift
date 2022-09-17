@@ -1,11 +1,25 @@
 import Combine
 import Foundation
 
+var subscription = Set<AnyCancellable>()
 // A subject you get values from
 let subject = PassthroughSubject<Int, Never>()
 
-<#Add your code here#>
+let strings = subject
+    .collect(.byTime(DispatchQueue.main, .seconds(0.5)))
+    .map({array in
+        String(array.map {Character(Unicode.Scalar($0)!)})
+    })
 
+let spaces = subject.measureInterval(using: DispatchQueue.main)
+    .map { interval in
+        interval > 0.9 ? "CLAP" : ""
+    }
+
+strings.merge(with: spaces)
+    .filter({!$0.isEmpty})
+    .sink(receiveValue: {print($0)})
+    .store(in: &subscription)
 // Let's roll!
 startFeeding(subject: subject)
 
