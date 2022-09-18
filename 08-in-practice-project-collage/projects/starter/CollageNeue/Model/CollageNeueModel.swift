@@ -60,6 +60,9 @@ class CollageNeueModel: ObservableObject {
   func add() {
     selectedPhotosSubject = PassthroughSubject<UIImage, Never>()
     let newPhotos = selectedPhotosSubject
+      .prefix(while: { [unowned self] _ in
+        self.images.value.count < 6
+      }).share()
     
     newPhotos
       .map { [unowned self] newImage in
