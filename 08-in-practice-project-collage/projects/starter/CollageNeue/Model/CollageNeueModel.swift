@@ -74,7 +74,22 @@ class CollageNeueModel: ObservableObject {
   }
 
   func save() {
-    
+    guard let image = imagePreview else { return }
+    // 1
+    PhotoWriter.save(image)
+      .sink(
+        receiveCompletion: { [unowned self] completion in
+          // 2
+          if case .failure(let error) = completion {
+            lastErrorMessage = error.localizedDescription
+          }
+          clear() },
+        receiveValue: { [unowned self] id in
+          // 3
+          lastSavedPhotoID = id
+        }
+      )
+      .store(in: &subscriptions)
   }
   
   // MARK: -  Displaying photos picker
