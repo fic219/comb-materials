@@ -38,7 +38,9 @@ class CollageNeueModel: ObservableObject {
   
   private var subscriptions = Set<AnyCancellable>()
   private let images = CurrentValueSubject<[UIImage], Never>([])
+  
   let updateUISubject = PassthroughSubject<Int, Never>()
+  private(set) var selectedPhotosSubject = PassthroughSubject<UIImage, Never>()
   
   // MARK: - Collage
   
@@ -56,7 +58,15 @@ class CollageNeueModel: ObservableObject {
   }
 
   func add() {
-     images.value.append(UIImage(named: "IMG_1907")!)
+    selectedPhotosSubject = PassthroughSubject<UIImage, Never>()
+    let newPhotos = selectedPhotosSubject
+    
+    newPhotos
+      .map { [unowned self] newImage in
+      return self.images.value + [newImage]
+    }
+      .assign(to: \.value, on: images)
+      .store(in: &subscriptions)
   }
 
   func clear() {
@@ -107,7 +117,7 @@ class CollageNeueModel: ObservableObject {
         return
       }
       
-      // Send the selected image
+      self.selectedPhotosSubject.send(image)
     }
   }
 }
