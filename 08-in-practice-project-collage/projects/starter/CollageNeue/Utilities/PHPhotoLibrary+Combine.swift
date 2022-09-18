@@ -31,6 +31,14 @@ import Photos
 import Combine
 
 extension PHPhotoLibrary {
+  
+  static var isAuthorized: AnyPublisher<Bool, Never> {
+    Future { resolve in
+      fetchAuthorizationStatus { authorized in
+        resolve(.success(authorized))
+      }
+    }.eraseToAnyPublisher()
+  }
 
   static func fetchAuthorizationStatus(callback: @escaping (Bool) -> Void) {
     // Fetch the current status.
