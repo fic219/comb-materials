@@ -101,6 +101,7 @@ struct MainView: View {
       PhotosView().environmentObject(model)
     }
     .onAppear(perform: model.bindMainView)
+    .onReceive(model.updateUISubject, perform: updateUI)
   }
   
   func updateUI(photosCount: Int) {
