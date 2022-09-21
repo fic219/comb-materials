@@ -53,13 +53,44 @@ struct API {
             .eraseToAnyPublisher()
     }
   
+    func mergedStories(ids storyIDs: [Int]) -> AnyPublisher<Story, Error> {
+        let storyIDs = Array(storyIDs.prefix(maxStories))
+        
+        let initialPublisher = story(id: storyIDs[0])
+        let remainder = Array(storyIDs.dropFirst())
+        
+        return remainder.reduce(initialPublisher) { combined, id in
+            return combined
+                .merge(with: story(id: id))
+                .eraseToAnyPublisher()
+        }
+    }
+    
+    func stories() -> AnyPublisher<[Story], Error> {
+        
+        URLSession.shared
+         .dataTaskPublisher(for: EndPoint.stories.url)
+         .map(\.data)
+         .decode(type: [Int].self, decoder: decoder)
+         .mapError { error -> API.Error in
+             switch error {
+             case is URLError:
+                 return Error.addressUnreachable(EndPoint.stories.url)
+             default:
+                 return Error.invalidResponse
+             }
+         }
+        
+        return Empty().eraseToAnyPublisher()
+    }
 }
 
 let api = API()
 
 var subscriptions = [AnyCancellable]()
 
-let publisher = api.story(id: 10)
+let publisher = api.mergedStories(ids: [10, 11, 12])
+
 publisher.sink(receiveCompletion: { result in
     print("api result: \(result)")
 }, receiveValue: { story in
