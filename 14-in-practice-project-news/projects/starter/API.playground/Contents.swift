@@ -39,11 +39,33 @@ struct API {
   /// A shared JSON decoder to use in calls.
   private let decoder = JSONDecoder()
   
-  // <#Add your API code here#>
+    private let apiQueue = DispatchQueue(label: "API",
+                                        qos: .default,
+                                        attributes: .concurrent)
+    func story(id: Int) -> AnyPublisher<Story, Error> {
+        
+        URLSession.shared
+            .dataTaskPublisher(for: EndPoint.story(id).url)
+            .receive(on: apiQueue)
+            .map(\.data)
+            .decode(type: Story.self, decoder: decoder)
+            .catch { _ in Empty<Story, Error>()}
+            .eraseToAnyPublisher()
+    }
   
 }
 
-// <#Call the API here#>
+let api = API()
+
+var subscriptions = [AnyCancellable]()
+
+let publisher = api.story(id: 10)
+publisher.sink(receiveCompletion: { result in
+    print("api result: \(result)")
+}, receiveValue: { story in
+     print("story: \(story)")
+})
+.store(in: &subscriptions)
 
 
 // Run indefinitely.
