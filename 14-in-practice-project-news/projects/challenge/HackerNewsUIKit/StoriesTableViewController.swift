@@ -50,7 +50,9 @@ class StoriesTableViewController: UITableViewController {
     api.stories()
       .receive(on: DispatchQueue.main)
       .catch { _ in Empty() }
-      .assign(to: \.stories, on: self)
+      .sink(receiveValue: { receivedStories in
+          self.stories = receivedStories
+      })
       .store(in: &subscriptions)
   }
   
