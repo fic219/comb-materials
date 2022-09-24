@@ -80,8 +80,15 @@ struct API {
                  return Error.invalidResponse
              }
          }
-        
-        return Empty().eraseToAnyPublisher()
+         .filter { !$0.isEmpty }
+         .flatMap { storyIds in
+             return self.mergedStories(ids: storyIds)
+         }
+         .scan([]) { stories, story -> [Story] in
+            return stories + [story]
+         }
+         .map { $0.sorted() }
+         .eraseToAnyPublisher()
     }
 }
 
@@ -89,7 +96,7 @@ let api = API()
 
 var subscriptions = [AnyCancellable]()
 
-let publisher = api.mergedStories(ids: [10, 11, 12])
+let publisher = api.stories()
 
 publisher.sink(receiveCompletion: { result in
     print("api result: \(result)")
