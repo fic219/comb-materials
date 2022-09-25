@@ -29,7 +29,7 @@
 import SwiftUI
 
 struct ReaderView: View {
-  var model: ReaderViewModel
+  @ObservedObject var model: ReaderViewModel
   @State var presentingSettingsSheet = false
 
   var currentDate = Date()
